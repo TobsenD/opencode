@@ -12,6 +12,15 @@ OpenCode can be installed using:
 
 All methods install the same components to the same locations.
 
+## NixOS Users
+
+If you're on NixOS, see **[README-NIXOS.md](README-NIXOS.md)** for comprehensive NixOS-specific installation guide covering:
+- System-wide installation with `nixos-rebuild switch`
+- Flake-based configuration (inline and separate flakes)
+- Home-manager integration
+- Multi-machine setups
+- NixOS troubleshooting
+
 ## What Gets Installed
 
 ```
@@ -82,7 +91,7 @@ The installer is interactive and will show you:
 
 ==> Files to be installed
   - script/opencode.sh              → ~/.opencode-container/bin/opencode.sh
-  - script/_opencode                → ~/.opencode-container/completion/_opencode.zsh
+  - completion/_opencode.zsh        → ~/.opencode-container/completion/_opencode.zsh
   - container/Containerfile         → ~/.opencode-container/container/Containerfile
   ...
 
@@ -167,7 +176,7 @@ shellcheck install.sh
 
 For NixOS users who want to install OpenCode as a package.
 
-### One-time Installation
+### Quick Installation (Imperative)
 
 ```bash
 nix profile install github:anomalyco/opencode
@@ -175,31 +184,55 @@ nix profile install github:anomalyco/opencode
 
 This installs the `opencode` executable and makes it available in your PATH.
 
-### System-wide Installation (Declaratively)
+### System-wide Installation (Declarative)
 
-Add to your `configuration.nix`:
+For system-wide installation accessible to all users, use `nixos-rebuild switch`.
+
+**Option A: Inline Flake Configuration**
+
+Add to your NixOS system flake (`/etc/nixos/flake.nix`):
 
 ```nix
-{ config, pkgs, ... }:
-{
-  environment.systemPackages = with pkgs; [
-    # ... other packages
-  ];
+inputs = {
+  # ... existing inputs ...
+  opencode.url = "github:anomalyco/opencode";
+};
+```
 
-  # Add OpenCode flake input
-  nix.inputs.opencode.url = "github:anomalyco/opencode";
+Then in `/etc/nixos/configuration.nix`:
+
+```nix
+{ config, pkgs, opencode, ... }:
+{
+  environment.systemPackages = [
+    opencode.packages.${pkgs.system}.default
+  ];
 }
 ```
 
-Then apply:
+Apply with:
 
 ```bash
 sudo nixos-rebuild switch
 ```
 
+**Option B: Separate System Flake (Recommended)**
+
+Create `/etc/nixos/flake.nix` with OpenCode as a dedicated input and reference it in your configuration. See [README-NIXOS.md](README-NIXOS.md#approach-b-separate-system-flake-idiomatic-nixos) for complete example.
+
+### For Complete NixOS Integration Guide
+
+**See [README-NIXOS.md](README-NIXOS.md) for:**
+- System-wide installation with both imperative and declarative approaches
+- Multi-machine setups
+- NixOS-specific troubleshooting
+- When to use each method
+
 ## Method 4: NixOS Home-Manager Integration
 
 For users with home-manager configuration who want declarative setup.
+
+**Note:** For system-wide home-manager integration with `nixos-rebuild switch`, see [README-NIXOS.md](README-NIXOS.md).
 
 ### Step 1: Add OpenCode Input to Your Flake
 
