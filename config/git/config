@@ -1,5 +1,17 @@
+# OpenCode Git Configuration Template
+# This file is used as a fallback when host git config is not available.
+# 
+# For persistent personal git identity in containers, configure git on the host:
+#   git config --global user.name "Your Name"
+#   git config --global user.email "your@email.com"
+#
+# Containers will automatically detect and use your host configuration.
+# If host config is missing, this template provides fallback defaults.
+
 [user]
+    # Fallback name (auto-detected from host if available)
     name = TobsenCode
-    email = {{ git_email }}
+    # Fallback email (auto-detected from host if available)
+    email = tobias@opencode.dev
 [init]
     defaultBranch = main

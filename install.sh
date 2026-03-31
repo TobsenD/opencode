@@ -72,10 +72,8 @@ check_dependencies() {
   
   if command -v podman >/dev/null 2>&1; then
     log_ok "podman found: $(podman --version)"
-    return 0
   elif command -v docker >/dev/null 2>&1; then
     log_ok "docker found: $(docker --version)"
-    return 0
   else
     log_warn "Neither podman nor docker found!"
     cat << 'EOF'
@@ -92,6 +90,38 @@ EOF
     if ! prompt_yn "Continue without podman/docker?"; then
       log_warn "Installation cancelled."
       exit 0
+    fi
+  fi
+
+  # Check git configuration
+  log_step "Checking git configuration"
+
+  if ! command -v git >/dev/null 2>&1; then
+    log_warn "Git not found! Containers will not be able to use git."
+  else
+    local git_name git_email
+    git_name=$(git config --global user.name 2>/dev/null || echo "")
+    git_email=$(git config --global user.email 2>/dev/null || echo "")
+
+    if [[ -z "$git_name" || -z "$git_email" ]]; then
+      log_warn "Git identity not configured!"
+      cat << 'GITHELP'
+
+OpenCode containers will auto-detect your git identity from the host.
+Currently, git is not configured with a user identity.
+
+To set your git identity globally, run:
+  git config --global user.name "Your Name"
+  git config --global user.email "your@email.com"
+
+You can verify with:
+  git config --global user.name
+  git config --global user.email
+
+If you don't configure this, containers will use a fallback identity.
+GITHELP
+    else
+      log_ok "Git configured: $git_name <$git_email>"
     fi
   fi
 }
