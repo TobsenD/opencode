@@ -40,12 +40,15 @@ COPY entrypoint-validate-git.sh /usr/local/bin/opencode-entrypoint
 RUN chmod +x /usr/local/bin/opencode-entrypoint && \
     mkdir -p /root/.config.host
 
-# Disable GPG signing in container environment to prevent signing failures
-# when GPG keys are not available. User config at /root/.config/git/config
-# can still enable signing for other settings; this system-level override
-# ensures commits work in the container without GPG setup.
+# Configure git for container environment
+# - Disable GPG signing (keys not available in container)
+# - Set default editor to vi (nvim not installed, vi is standard)
+# User config at /root/.config/git/config can still enable GPG signing
+# for other settings; these system-level overrides ensure git commands
+# work smoothly in the container environment.
 RUN git config --system commit.gpgsign false && \
-    git config --system tag.gpgsign false
+    git config --system tag.gpgsign false && \
+    git config --system core.editor vi
 
 WORKDIR /workspace
 ENTRYPOINT ["/usr/local/bin/opencode-entrypoint"]
