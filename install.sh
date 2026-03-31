@@ -155,9 +155,9 @@ create_directories() {
 # Display what will be copied
 show_copy_plan() {
   log_step "Files to be installed"
-  cat << 'EOF'
+   cat << 'EOF'
   - script/opencode.sh              → ~/.opencode-container/bin/opencode.sh
-  - script/_opencode                → ~/.opencode-container/completion/_opencode.zsh
+  - completion/_opencode.zsh        → ~/.opencode-container/completion/_opencode.zsh
   - container/Containerfile         → ~/.opencode-container/container/Containerfile
   - config/git/config               → ~/.opencode-container/config/git/config
   - config/opencode/AGENTS.md       → ~/.opencode-container/config/opencode/AGENTS.md
@@ -184,14 +184,14 @@ copy_files() {
     die "script/opencode.sh not found in $SCRIPT_DIR"
   fi
   
-  # Copy zsh completion
-  if [[ -f "$SCRIPT_DIR/script/_opencode" ]]; then
-    cp "$SCRIPT_DIR/script/_opencode" "$STATE_DIR/completion/_opencode.zsh" || die "Failed to copy _opencode"
-    chmod +x "$STATE_DIR/completion/_opencode.zsh"
-    log_ok "Installed zsh completion"
-  else
-    die "script/_opencode not found in $SCRIPT_DIR"
-  fi
+   # Copy zsh completion
+   if [[ -f "$SCRIPT_DIR/completion/_opencode.zsh" ]]; then
+     cp "$SCRIPT_DIR/completion/_opencode.zsh" "$STATE_DIR/completion/_opencode.zsh" || die "Failed to copy _opencode.zsh"
+     chmod +x "$STATE_DIR/completion/_opencode.zsh"
+     log_ok "Installed zsh completion"
+   else
+     die "completion/_opencode.zsh not found in $SCRIPT_DIR"
+   fi
   
   # Copy Containerfile
   if [[ -f "$SCRIPT_DIR/container/Containerfile" ]]; then

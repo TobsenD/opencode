@@ -49,91 +49,72 @@
           ];
 
           installPhase = ''
-            mkdir -p $out/bin
-            mkdir -p $out/lib/opencode
-            mkdir -p $out/share/zsh/site-functions
+            mkdir -p $out/lib/opencode/{bin,completion,container,config/git,config/opencode}
 
             # Copy main script
-            cp script/opencode.sh $out/bin/opencode
-            chmod +x $out/bin/opencode
+            cp script/opencode.sh $out/lib/opencode/bin/opencode.sh
+            chmod +x $out/lib/opencode/bin/opencode.sh
 
             # Copy zsh completion
-            cp completion/_opencode.zsh $out/share/zsh/site-functions/_opencode
+            cp completion/_opencode.zsh $out/lib/opencode/completion/_opencode.zsh
 
             # Copy container definition
-            cp container/Containerfile $out/lib/opencode/
+            cp container/Containerfile $out/lib/opencode/container/
 
             # Copy config templates
-            mkdir -p $out/lib/opencode/config/git
-            mkdir -p $out/lib/opencode/config/opencode
             cp config/git/config $out/lib/opencode/config/git/
             cp config/opencode/AGENTS.md $out/lib/opencode/config/opencode/
             cp config/opencode/opencode.jsonc $out/lib/opencode/config/opencode/
             cp config/opencode/tui.jsonc $out/lib/opencode/config/opencode/
 
-            # Copy installer
-            cp install.sh $out/lib/opencode/
-
-            # Create wrapper script that sets up the environment
-            cat > $out/bin/opencode-init << 'WRAPPER'
+            # Create wrapper script that initializes ~/.opencode-container and runs opencode
+            mkdir -p $out/bin
+            cat > $out/bin/opencode << 'WRAPPER'
             #!/${pkgs.bash}/bin/bash
             set -euo pipefail
 
             # First-time setup: copy files to ~/.opencode-container if not present
             if [[ ! -d "$HOME/.opencode-container" ]]; then
-              mkdir -p "$HOME/.opencode-container"
-              cp -r ${pkgs.lib.getLib}/../lib/opencode/* "$HOME/.opencode-container/"
+              mkdir -p "$HOME/.opencode-container/bin"
+              mkdir -p "$HOME/.opencode-container/completion"
+              mkdir -p "$HOME/.opencode-container/container"
+              mkdir -p "$HOME/.opencode-container/config/git"
+              mkdir -p "$HOME/.opencode-container/config/opencode"
+
+              # Copy files from package to user's home
+              cp ${placeholder "out"}/lib/opencode/bin/opencode.sh "$HOME/.opencode-container/bin/"
+              cp ${placeholder "out"}/lib/opencode/completion/_opencode.zsh "$HOME/.opencode-container/completion/"
+              cp ${placeholder "out"}/lib/opencode/container/Containerfile "$HOME/.opencode-container/container/"
+              
+              # Copy config files (only if they don't exist)
+              [[ ! -f "$HOME/.opencode-container/config/git/config" ]] && \
+                cp ${placeholder "out"}/lib/opencode/config/git/config "$HOME/.opencode-container/config/git/"
+              [[ ! -f "$HOME/.opencode-container/config/opencode/AGENTS.md" ]] && \
+                cp ${placeholder "out"}/lib/opencode/config/opencode/AGENTS.md "$HOME/.opencode-container/config/opencode/"
+              [[ ! -f "$HOME/.opencode-container/config/opencode/opencode.jsonc" ]] && \
+                cp ${placeholder "out"}/lib/opencode/config/opencode/opencode.jsonc "$HOME/.opencode-container/config/opencode/"
+              [[ ! -f "$HOME/.opencode-container/config/opencode/tui.jsonc" ]] && \
+                cp ${placeholder "out"}/lib/opencode/config/opencode/tui.jsonc "$HOME/.opencode-container/config/opencode/"
             fi
 
-            # Execute the opencode script
-            exec "$HOME/.opencode-container/opencode.sh" "$@"
+            # Execute the opencode script from ~/.opencode-container
+            exec "$HOME/.opencode-container/bin/opencode.sh" "''${@}"
             WRAPPER
 
-            chmod +x $out/bin/opencode-init
+            chmod +x $out/bin/opencode
           '';
 
           meta = with pkgs.lib; {
             description = "OpenCode - Container-based development environment";
             homepage = "https://github.com/anomalyco/opencode";
-            license = licenses.unfree; # Adjust based on your license
+            license = licenses.unfree;
             platforms = platforms.all;
             maintainers = [ ];
           };
         };
-
-        # Alternative package that uses the installer
-        packages.with-installer = pkgs.stdenv.mkDerivation {
-          name = "opencode-installer";
-          version = "1.0.0";
-          
-          src = self;
-
-          buildInputs = with pkgs; [
-            bash
-            coreutils
-          ];
-
-          installPhase = ''
-            mkdir -p $out/bin
-            mkdir -p $out/share/opencode
-
-            # Copy all source files
-            cp -r . $out/share/opencode/
-
-            # Create wrapper that runs the installer
-            cat > $out/bin/opencode-install << 'WRAPPER'
-            #!/${pkgs.bash}/bin/bash
-            set -euo pipefail
-            cd ${pkgs.lib.getLib}/../share/opencode/
-            exec ./install.sh "$@"
-            WRAPPER
-
-            chmod +x $out/bin/opencode-install
-          '';
-        };
       }
     ) // {
-      # Home-manager module
+      # Home-manager module for declarative installation
       homeManagerModules.default = { config, lib, pkgs, ... }:
         with lib;
         let
@@ -155,23 +136,21 @@
             # Add opencode to PATH
             home.packages = [ cfg.package ];
 
-            # Install zsh completion if using zsh
-            programs.zsh.completionInit = ''
-              # OpenCode completion
-              fpath+=(${cfg.package}/share/zsh/site-functions)
-            '';
-
             # Create ~/.opencode-container on first login
-            home.activation.setupOpencode = hm.dag.entryAfter [ "linkGeneration" ] ''
+            home.activation.setupOpencode = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
               if [[ ! -d "$HOME/.opencode-container" ]]; then
-                $DRY_RUN_CMD mkdir -p "$HOME/.opencode-container"
-                $DRY_RUN_CMD mkdir -p "$HOME/.opencode-container/config/git"
-                $DRY_RUN_CMD mkdir -p "$HOME/.opencode-container/config/opencode"
                 $DRY_RUN_CMD mkdir -p "$HOME/.opencode-container/bin"
                 $DRY_RUN_CMD mkdir -p "$HOME/.opencode-container/completion"
                 $DRY_RUN_CMD mkdir -p "$HOME/.opencode-container/container"
+                $DRY_RUN_CMD mkdir -p "$HOME/.opencode-container/config/git"
+                $DRY_RUN_CMD mkdir -p "$HOME/.opencode-container/config/opencode"
 
-                # Copy config templates
+                # Copy files from package
+                $DRY_RUN_CMD cp ${cfg.package}/lib/opencode/bin/opencode.sh "$HOME/.opencode-container/bin/"
+                $DRY_RUN_CMD cp ${cfg.package}/lib/opencode/completion/_opencode.zsh "$HOME/.opencode-container/completion/"
+                $DRY_RUN_CMD cp ${cfg.package}/lib/opencode/container/Containerfile "$HOME/.opencode-container/container/"
+
+                # Copy config files (only if they don't exist - protect user customizations)
                 [[ ! -f "$HOME/.opencode-container/config/git/config" ]] && \
                   $DRY_RUN_CMD cp ${cfg.package}/lib/opencode/config/git/config "$HOME/.opencode-container/config/git/"
                 [[ ! -f "$HOME/.opencode-container/config/opencode/AGENTS.md" ]] && \
@@ -180,16 +159,12 @@
                   $DRY_RUN_CMD cp ${cfg.package}/lib/opencode/config/opencode/opencode.jsonc "$HOME/.opencode-container/config/opencode/"
                 [[ ! -f "$HOME/.opencode-container/config/opencode/tui.jsonc" ]] && \
                   $DRY_RUN_CMD cp ${cfg.package}/lib/opencode/config/opencode/tui.jsonc "$HOME/.opencode-container/config/opencode/"
-
-                $DRY_RUN_CMD cp ${cfg.package}/lib/opencode/container/Containerfile "$HOME/.opencode-container/container/"
               fi
             '';
 
-            # Create ~/.local/bin/opencode symlink
+            # Create symlinks for direct access
             home.file.".local/bin/opencode".source = "${cfg.package}/bin/opencode";
-
-            # Create zsh completion symlink
-            home.file.".config/zsh/completions.d/_opencode".source = "${cfg.package}/share/zsh/site-functions/_opencode";
+            home.file.".config/zsh/completions.d/_opencode".source = "${cfg.package}/lib/opencode/completion/_opencode.zsh";
           };
         };
     };
