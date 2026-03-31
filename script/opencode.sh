@@ -457,12 +457,18 @@ run_or_shell_cmd() {
     cmd+=(-p "$p")
   done
 
-  local e
-  for e in "${env_vars[@]}"; do
-    cmd+=(-e "$e")
-  done
+   local e
+   for e in "${env_vars[@]}"; do
+     cmd+=(-e "$e")
+   done
 
-  if [[ "$mode" == "shell" ]]; then
+   # Disable GPG signing in container runtime to avoid GPG key issues
+   # Use git command-line config overrides to disable commit.gpgsign
+   cmd+=(-e "GIT_CONFIG_COUNT=1")
+   cmd+=(-e "GIT_CONFIG_KEY_0=commit.gpgsign")
+   cmd+=(-e "GIT_CONFIG_VALUE_0=false")
+
+   if [[ "$mode" == "shell" ]]; then
     cmd+=(--entrypoint /bin/bash)
     cmd+=("$image_name")
   else
