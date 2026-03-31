@@ -136,6 +136,31 @@ containerfile_sha() {
   sha256sum "$CONTAINERFILE" | awk '{print $1}'
 }
 
+stage_entrypoint_script() {
+  local entrypoint_src entrypoint_dest
+  
+  # Look for entrypoint script relative to SCRIPT_DIR
+  # SCRIPT_DIR is script/, we need ../container/entrypoint-validate-git.sh
+  entrypoint_src="$SCRIPT_DIR/../container/entrypoint-validate-git.sh"
+  entrypoint_dest="$BUILD_CONTEXT/entrypoint-validate-git.sh"
+  
+  # If already in build context, nothing to do
+  if [[ -f "$entrypoint_dest" ]]; then
+    log_info "Entrypoint script already in build context"
+    return 0
+  fi
+  
+  # Copy from source to build context
+  if [[ -f "$entrypoint_src" ]]; then
+    cp "$entrypoint_src" "$entrypoint_dest" || die "Failed to copy entrypoint script to build context"
+    chmod +x "$entrypoint_dest" || die "Failed to make entrypoint script executable"
+    log_ok "Staged entrypoint script in build context"
+    return 0
+  fi
+  
+  die "Entrypoint script not found at $entrypoint_src"
+}
+
 image_exists() {
   podman image exists "$DEFAULT_IMAGE_NAME"
 }
@@ -150,6 +175,10 @@ build_image() {
   log_step "Image build started"
   log_info "Image: ${DEFAULT_IMAGE_NAME}"
   log_info "Containerfile: ${CONTAINERFILE}"
+  
+  # Ensure entrypoint script is staged in build context
+  stage_entrypoint_script
+  
   podman build \
     -t "$DEFAULT_IMAGE_NAME" \
     -f "$CONTAINERFILE" \

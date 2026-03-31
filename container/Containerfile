@@ -36,7 +36,7 @@ RUN npm install -g opencode-ai playwright
 ENV PATH="/root/.cargo/bin:/usr/local/lib/node_modules/opencode-ai/bin:${PATH}"
 
 # Copy git validation script and set up host config mount point
-COPY container/entrypoint-validate-git.sh /usr/local/bin/opencode-entrypoint
+COPY entrypoint-validate-git.sh /usr/local/bin/opencode-entrypoint
 RUN chmod +x /usr/local/bin/opencode-entrypoint && \
     mkdir -p /root/.config.host
 
