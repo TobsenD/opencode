@@ -78,5 +78,18 @@
     "labels": [
       "security"
     ]
-  }
+  },
+  "assignees": [
+    "@TobsenD"
+  ],
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
+  "reviewers": [
+    "@TobsenD"
+  ],
+  "assigneesSampleSize": 1,
+  "ignoreDeps": [],
+  "automerge": false
 }
