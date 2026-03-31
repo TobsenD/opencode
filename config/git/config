@@ -1,0 +1,5 @@
+[user]
+    name = TobsenCode
+    email = {{ git_email }}
+[init]
+    defaultBranch = main

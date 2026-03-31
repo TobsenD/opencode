@@ -1,0 +1,34 @@
+FROM node:22-slim
+
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+      git \
+      curl \
+      ca-certificates \
+      ripgrep \
+      fd-find \
+      jq \
+      yq \
+      unzip \
+      xz-utils \
+      procps \
+      python3 \
+      python3-pip \
+      python3-venv \
+      build-essential \
+      chromium \
+      openssh-client \
+      netcat-openbsd \
+      iputils-ping \
+      libcap2-bin \
+    && \
+    rm -rf /var/lib/apt/lists/* && \
+    setcap cap_net_raw+p /usr/bin/ping
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN npm install -g opencode-ai playwright
+
+ENV PATH="/root/.cargo/bin:/usr/local/lib/node_modules/opencode-ai/bin:${PATH}"
+
+WORKDIR /workspace
+ENTRYPOINT ["opencode"]
