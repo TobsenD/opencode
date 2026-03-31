@@ -1,0 +1,25 @@
+name: Renovate Container Dependencies
+
+on:
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Renovate
+        uses: renovatebot/renovate:43.101.2
+        with:
+          configurationFile: .github/renovate.json
+        env:
+          LOG_LEVEL: info

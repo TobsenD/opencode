@@ -1,0 +1,82 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    "docker:enableMajor",
+    "docker:pinDigests"
+  ],
+  "schedule": [
+    "before 3am on the first day of the month",
+    "before 3am every Sunday",
+    "before 3am every weekday"
+  ],
+  "timezone": "UTC",
+  "dockerfile": true,
+  "docker": {
+    "enabled": true
+  },
+  "containerfilePattern": "^Dockerfile|Containerfile$",
+  "postUpdateOptions": [
+    "gomodTidy",
+    "npmDedupe",
+    "yarnDedupeHighest",
+    "rustCargoToml"
+  ],
+  "enabledManagers": [
+    "dockerfile",
+    "npm",
+    "nix"
+  ],
+  "packageRules": [
+    {
+      "groupName": "Docker base images",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch"
+      ],
+      "schedule": [
+        "before 3am UTC every day"
+      ]
+    },
+    {
+      "groupName": "npm packages",
+      "matchDatasources": [
+        "npm"
+      ],
+      "schedule": [
+        "before 3am UTC every day"
+      ]
+    },
+    {
+      "groupName": "Renovate bot updates",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackagePatterns": [
+        "renovatebot/renovate"
+      ],
+      "enabled": true,
+      "schedule": [
+        "before 3am UTC every day"
+      ],
+      "automerge": false
+    }
+  ],
+  "prConcurrentLimit": 5,
+  "prCreation": "immediate",
+  "commitMessagePrefix": "chore(deps):",
+  "commitMessageAction": "update",
+  "commitMessageTopic": "{{{depName}}}",
+  "commitMessageExtra": "to {{{newVersion}}}",
+  "semanticCommits": "enabled",
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": [
+      "security"
+    ]
+  }
+}
