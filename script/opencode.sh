@@ -404,8 +404,8 @@ run_or_shell_cmd() {
   ensure_state_dirs
   
   # Validate host git configuration
-  if [[ ! -f "$HOME/.config/git/config" ]]; then
-    log_warn "No git config found at ~/.config/git/config"
+  if [[ ! -f "$HOME/.config/git/config" && ! -f "$HOME/.gitconfig" ]]; then
+    log_warn "No git config found at ~/.config/git/config or ~/.gitconfig"
     log_info "Container will use fallback git identity or GIT_AUTHOR_* environment variables"
   fi
   
@@ -429,9 +429,16 @@ run_or_shell_cmd() {
     -v "$OPENCODE_DATA_DIR:/root/.opencode:Z"
     -v "$CONFIG_DIR:/root/.config:Z"
     -v "$LOCAL_DIR:/root/.local:Z"
-    -v "$HOME/.config/git/config:/root/.config.host/git/config:ro,Z"
     -w /workspace
   )
+
+  # Mount git config from host (supports both XDG and legacy locations)
+  if [[ -f "$HOME/.config/git/config" ]]; then
+    cmd+=(-v "$HOME/.config/git/config:/root/.config.host/git/config:ro,Z")
+  fi
+  if [[ -f "$HOME/.gitconfig" ]]; then
+    cmd+=(-v "$HOME/.gitconfig:/root/.config.host/.gitconfig:ro,Z")
+  fi
 
   if [[ -n "$memory_limit" ]]; then
     cmd+=(--memory "$memory_limit")

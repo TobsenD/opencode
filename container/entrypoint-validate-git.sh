@@ -13,7 +13,8 @@ readonly BLUE='\033[0;34m'
 readonly RESET='\033[0m'
 
 # Paths
-readonly HOST_GIT_CONFIG="/root/.config.host/git/config"
+readonly HOST_GIT_CONFIG_XDG="/root/.config.host/git/config"
+readonly HOST_GIT_CONFIG_LEGACY="/root/.config.host/.gitconfig"
 readonly CONTAINER_GIT_CONFIG="/root/.config/git/config"
 readonly GIT_CONFIG_DIR="/root/.config/git"
 
@@ -42,11 +43,20 @@ detect_git_identity() {
     return 0
   fi
 
-  # Try to load from host config
-  if [[ -f "$HOST_GIT_CONFIG" ]]; then
+  # Try to load from host config (XDG standard location first, then legacy)
+  local config_source=""
+  if [[ -f "$HOST_GIT_CONFIG_XDG" ]]; then
+    config_source="$HOST_GIT_CONFIG_XDG"
+    log_info "Found host git config at ~/.config/git/config"
+  elif [[ -f "$HOST_GIT_CONFIG_LEGACY" ]]; then
+    config_source="$HOST_GIT_CONFIG_LEGACY"
+    log_info "Found host git config at ~/.gitconfig"
+  fi
+
+  if [[ -n "$config_source" ]]; then
     log_info "Loading git config from host..."
     mkdir -p "$GIT_CONFIG_DIR"
-    cp "$HOST_GIT_CONFIG" "$CONTAINER_GIT_CONFIG"
+    cp "$config_source" "$CONTAINER_GIT_CONFIG"
 
     # Verify it worked
     name=$(git config user.name 2>/dev/null || echo "")
@@ -58,20 +68,30 @@ detect_git_identity() {
     fi
   fi
 
-  # Fallback: use template defaults or environment variables
+  # Fallback: use environment variables first, then template defaults
   log_warn "No git identity configured, using fallback..."
 
   # Check environment variable overrides first
-  name="${GIT_AUTHOR_NAME:-TobsenCode}"
-  email="${GIT_AUTHOR_EMAIL:-tobias@opencode.dev}"
+  name="${GIT_AUTHOR_NAME:-}"
+  email="${GIT_AUTHOR_EMAIL:-}"
+
+  if [[ -z "$name" || -z "$email" ]]; then
+    name="${GIT_AUTHOR_NAME:-TobsenCode}"
+    email="${GIT_AUTHOR_EMAIL:-tobias@opencode.dev}"
+    log_warn "Using template fallback identity: $name <$email>"
+  else
+    log_info "Using identity from GIT_AUTHOR_* environment variables"
+  fi
 
   git config --global user.name "$name"
   git config --global user.email "$email"
 
-  log_warn "Using fallback identity: $name <$email>"
   log_info "To use your personal git identity in containers, configure git on the host:"
   log_info "  git config --global user.name 'Your Name'"
   log_info "  git config --global user.email 'your@email.com'"
+  log_info ""
+  log_info "Or pass environment variables when running opencode:"
+  log_info "  GIT_AUTHOR_NAME='Your Name' GIT_AUTHOR_EMAIL='your@email.com' opencode ."
 }
 
 # Main entry point
