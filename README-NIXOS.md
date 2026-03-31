@@ -17,7 +17,7 @@ All methods install OpenCode to `~/.opencode-container/` with symlinks to `~/.lo
 For a quick, per-user installation without modifying system configuration:
 
 ```bash
-nix profile install github:anomalyco/opencode
+nix profile install github:TobsenD/opencode
 ```
 
 This installs the `opencode` package to your profile and adds it to PATH.
@@ -61,7 +61,7 @@ Edit your home-manager `flake.nix`:
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    opencode.url = "github:anomalyco/opencode";
+    opencode.url = "github:TobsenD/opencode";
     # For local development:
     # opencode.url = "path:/path/to/local/opencode";
   };
@@ -142,7 +142,7 @@ Add OpenCode to inputs:
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    opencode.url = "github:anomalyco/opencode";
+    opencode.url = "github:TobsenD/opencode";
   };
 
   outputs = { self, nixpkgs, flake-utils, opencode }:
@@ -220,7 +220,7 @@ For more complex setups or when managing multiple machines, use a dedicated syst
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     opencode = {
-      url = "github:anomalyco/opencode";
+      url = "github:TobsenD/opencode";
       # For local development:
       # url = "path:/path/to/local/opencode";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -485,7 +485,7 @@ opencode.nixosModules.default
 
 ## Additional Resources
 
-- **OpenCode Repository:** https://github.com/anomalyco/opencode
+- **OpenCode Repository:** https://github.com/TobsenD/opencode
 - **Main Installation Guide:** [README.md](README.md)
 - **NixOS Manual:** https://nixos.org/manual/nixos/stable/
 - **Flakes Documentation:** https://nixos.wiki/wiki/Flakes

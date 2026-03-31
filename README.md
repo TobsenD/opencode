@@ -50,7 +50,7 @@ If you're on NixOS, see **[README-NIXOS.md](README-NIXOS.md)** for comprehensive
 ### Quick Install
 
 ```bash
-git clone https://github.com/anomalyco/opencode.git
+git clone https://github.com/TobsenD/opencode.git
 cd opencode
 ./install.sh
 ```
@@ -58,7 +58,7 @@ cd opencode
 ### Remote Install (One-liner)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anomalyco/opencode/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/TobsenD/opencode/main/install.sh | bash
 ```
 
 ### What It Does
@@ -150,7 +150,7 @@ For developers working on OpenCode itself.
 ### Enter Development Shell
 
 ```bash
-git clone https://github.com/anomalyco/opencode.git
+git clone https://github.com/TobsenD/opencode.git
 cd opencode
 nix flake show     # See available outputs
 nix develop        # Enter development environment
@@ -179,7 +179,7 @@ For NixOS users who want to install OpenCode as a package.
 ### Quick Installation (Imperative)
 
 ```bash
-nix profile install github:anomalyco/opencode
+nix profile install github:TobsenD/opencode
 ```
 
 This installs the `opencode` executable and makes it available in your PATH.
@@ -195,7 +195,7 @@ Add to your NixOS system flake (`/etc/nixos/flake.nix`):
 ```nix
 inputs = {
   # ... existing inputs ...
-  opencode.url = "github:anomalyco/opencode";
+  opencode.url = "github:TobsenD/opencode";
 };
 ```
 
@@ -246,7 +246,7 @@ In your home-manager flake (`flake.nix`):
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    opencode.url = "github:anomalyco/opencode";
+    opencode.url = "github:TobsenD/opencode";
     # or for local development:
     # opencode.url = "path:/path/to/opencode";
   };
@@ -526,7 +526,7 @@ yes | ./install.sh
 
 ## Support & Documentation
 
-- **OpenCode Repository:** https://github.com/anomalyco/opencode
+- **OpenCode Repository:** https://github.com/TobsenD/opencode
 - **Podman Docs:** https://docs.podman.io
 - **Home-Manager Docs:** https://nix-community.github.io/home-manager/
 

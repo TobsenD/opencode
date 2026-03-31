@@ -106,7 +106,7 @@
 
           meta = with pkgs.lib; {
             description = "OpenCode - Container-based development environment";
-            homepage = "https://github.com/anomalyco/opencode";
+            homepage = "https://github.com/TobsenD/opencode";
             license = licenses.unfree;
             platforms = platforms.all;
             maintainers = [ ];
