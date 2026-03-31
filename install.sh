@@ -159,6 +159,7 @@ show_copy_plan() {
   - script/opencode.sh              → ~/.opencode-container/bin/opencode.sh
   - completion/_opencode.zsh        → ~/.opencode-container/completion/_opencode.zsh
   - container/Containerfile         → ~/.opencode-container/container/Containerfile
+  - container/entrypoint-validate-git.sh → ~/.opencode-container/container/entrypoint-validate-git.sh
   - config/git/config               → ~/.opencode-container/config/git/config
   - config/opencode/AGENTS.md       → ~/.opencode-container/config/opencode/AGENTS.md
   - config/opencode/opencode.jsonc  → ~/.opencode-container/config/opencode/opencode.jsonc
@@ -199,6 +200,15 @@ copy_files() {
     log_ok "Installed Containerfile"
   else
     die "container/Containerfile not found in $SCRIPT_DIR"
+  fi
+  
+  # Copy entrypoint-validate-git.sh
+  if [[ -f "$SCRIPT_DIR/container/entrypoint-validate-git.sh" ]]; then
+    cp "$SCRIPT_DIR/container/entrypoint-validate-git.sh" "$STATE_DIR/container/entrypoint-validate-git.sh" || die "Failed to copy entrypoint-validate-git.sh"
+    chmod +x "$STATE_DIR/container/entrypoint-validate-git.sh"
+    log_ok "Installed entrypoint-validate-git.sh"
+  else
+    die "container/entrypoint-validate-git.sh not found in $SCRIPT_DIR"
   fi
   
   # Copy config files (only if they don't exist - protect user customizations)
