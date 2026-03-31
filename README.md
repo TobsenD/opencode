@@ -2,6 +2,9 @@
 
 This guide covers all methods to install OpenCode, a container-based development environment wrapper that uses podman/docker to provide an isolated, reproducible workspace.
 
+> **About This Project**  
+> This is a container wrapper and installation toolkit for [OpenCode](https://github.com/anomalyco/opencode). It provides enhanced installation methods (Bash, Nix flake, home-manager, nixos-rebuild) for the original OpenCode project. All credit for the core OpenCode functionality goes to the original authors at https://github.com/anomalyco/opencode.
+
 ## Installation Overview
 
 OpenCode can be installed using:
@@ -526,10 +529,13 @@ yes | ./install.sh
 
 ## Support & Documentation
 
-- **OpenCode Repository:** https://github.com/TobsenD/opencode
+- **This Project (Container Wrapper & Installation Toolkit):** https://github.com/TobsenD/opencode
+- **Original OpenCode Project:** https://github.com/anomalyco/opencode
 - **Podman Docs:** https://docs.podman.io
 - **Home-Manager Docs:** https://nix-community.github.io/home-manager/
 
 ## License
 
 OpenCode is provided as-is. See LICENSE file in the repository for details.
+
+This wrapper and installation toolkit respects the license of the original OpenCode project at https://github.com/anomalyco/opencode.

@@ -2,6 +2,9 @@
 
 This guide covers all methods to install OpenCode on NixOS systems, from quick per-user installation to system-wide declarative configuration.
 
+> **About This Project**  
+> This is a container wrapper and installation toolkit for [OpenCode](https://github.com/anomalyco/opencode). It provides enhanced installation methods specifically for NixOS users. All credit for the core OpenCode functionality goes to the original authors at https://github.com/anomalyco/opencode.
+
 ## Installation Methods Overview
 
 | Method | Scope | User | Setup | Use Case |
@@ -485,7 +488,8 @@ opencode.nixosModules.default
 
 ## Additional Resources
 
-- **OpenCode Repository:** https://github.com/TobsenD/opencode
+- **This Project (Container Wrapper & Installation Toolkit):** https://github.com/TobsenD/opencode
+- **Original OpenCode Project:** https://github.com/anomalyco/opencode
 - **Main Installation Guide:** [README.md](README.md)
 - **NixOS Manual:** https://nixos.org/manual/nixos/stable/
 - **Flakes Documentation:** https://nixos.wiki/wiki/Flakes
@@ -495,3 +499,5 @@ opencode.nixosModules.default
 ## License
 
 OpenCode is provided as-is. See LICENSE file in the repository for details.
+
+This wrapper and installation toolkit respects the license of the original OpenCode project at https://github.com/anomalyco/opencode.
