@@ -33,18 +33,11 @@ log_warn() {
 
 # Detect and configure git identity
 detect_git_identity() {
-  # Check if git is already configured
-  local name email
-  name=$(git config user.name 2>/dev/null || echo "")
-  email=$(git config user.email 2>/dev/null || echo "")
+  local name email config_source
 
-  if [[ -n "$name" && -n "$email" ]]; then
-    log_ok "Git identity detected: $name <$email>"
-    return 0
-  fi
-
-  # Try to load from host config (XDG standard location first, then legacy)
-  local config_source=""
+  # Priority 1: Check for host-provided config files
+  # Standard: XDG Base Directory Specification (~/.config/git/config)
+  # Legacy: ~/.gitconfig for backward compatibility
   if [[ -f "$HOST_GIT_CONFIG_XDG" ]]; then
     config_source="$HOST_GIT_CONFIG_XDG"
     log_info "Found host git config at ~/.config/git/config"
@@ -68,20 +61,33 @@ detect_git_identity() {
     fi
   fi
 
-  # Fallback: use environment variables first, then template defaults
-  log_warn "No git identity configured, using fallback..."
+  # Priority 2: Check if git is already configured in container
+  # (This only applies if no host config was found)
+  name=$(git config user.name 2>/dev/null || echo "")
+  email=$(git config user.email 2>/dev/null || echo "")
 
-  # Check environment variable overrides first
+  if [[ -n "$name" && -n "$email" ]]; then
+    log_ok "Git identity detected: $name <$email>"
+    return 0
+  fi
+
+  # Priority 3: Check environment variable overrides
   name="${GIT_AUTHOR_NAME:-}"
   email="${GIT_AUTHOR_EMAIL:-}"
 
-  if [[ -z "$name" || -z "$email" ]]; then
-    name="${GIT_AUTHOR_NAME:-TobsenCode}"
-    email="${GIT_AUTHOR_EMAIL:-tobias@opencode.dev}"
-    log_warn "Using template fallback identity: $name <$email>"
-  else
+  if [[ -n "$name" && -n "$email" ]]; then
     log_info "Using identity from GIT_AUTHOR_* environment variables"
+    git config --global user.name "$name"
+    git config --global user.email "$email"
+    log_ok "Git identity configured: $name <$email>"
+    return 0
   fi
+
+  # Priority 4: Fallback to template defaults
+  log_warn "No git identity configured, using fallback..."
+  name="TobsenCode"
+  email="tobias@opencode.dev"
+  log_warn "Using template fallback identity: $name <$email>"
 
   git config --global user.name "$name"
   git config --global user.email "$email"
