@@ -73,6 +73,12 @@
       "automerge": true
     }
   ],
+  "github-actions": {
+    "fileMatch": [
+      "/(^|/)(workflow-templates|\\.(?:github|gitea|forgejo)/(?:workflows|actions))/.+\\.ya?ml$/",
+      "/(^|/)action\\.ya?ml$/"
+    ]
+  },
   "prConcurrentLimit": 5,
   "prCreation": "immediate",
   "commitMessagePrefix": "chore(deps):",
