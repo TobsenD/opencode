@@ -64,6 +64,13 @@
         "before 3am UTC every day"
       ],
       "automerge": false
+    },
+    {
+      "description": "Update the Renovate GitHub action weekly with fix type",
+      "matchPackageNames": ["renovatebot/github-action"],
+      "extends": [":semanticCommitType(fix)", "schedule:weekly"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
     }
   ],
   "prConcurrentLimit": 5,
