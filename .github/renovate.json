@@ -43,27 +43,13 @@
       ],
       "matchPackagePatterns": [
         "renovatebot/renovate"
-<<<<<<< HEAD
-      ],
-      "enabled": true,
-      "schedule": [
-        "before 3am UTC every day"
-      ],
-      "automerge": false
-=======
       ]
->>>>>>> 7694763 (Fix renovate)
     },
     {
       "description": "Update the Renovate GitHub action weekly with fix type",
       "matchPackageNames": ["renovatebot/github-action"],
       "extends": [":semanticCommitType(fix)", "schedule:weekly"],
-<<<<<<< HEAD
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
-=======
       "matchUpdateTypes": ["minor", "patch"]
->>>>>>> 7694763 (Fix renovate)
     }
   ],
   "github-actions": {
