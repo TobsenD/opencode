@@ -1,21 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base",
-    "docker:enableMajor",
-    "docker:pinDigests"
-  ],
-  "schedule": [
-    "before 3am on the first day of the month",
-    "before 3am every Sunday",
-    "before 3am every weekday"
-  ],
-  "timezone": "UTC",
+  "baseBranches": ["main"],
+  "rebaseWhen": "conflicted",
+  "labels": ["dependencies"],
   "dockerfile": true,
   "docker": {
     "enabled": true
   },
-  "containerfilePattern": "^Dockerfile|Containerfile$",
   "postUpdateOptions": [
     "gomodTidy",
     "npmDedupe",
@@ -37,18 +28,12 @@
         "major",
         "minor",
         "patch"
-      ],
-      "schedule": [
-        "before 3am UTC every day"
       ]
     },
     {
       "groupName": "npm packages",
       "matchDatasources": [
         "npm"
-      ],
-      "schedule": [
-        "before 3am UTC every day"
       ]
     },
     {
@@ -58,19 +43,27 @@
       ],
       "matchPackagePatterns": [
         "renovatebot/renovate"
+<<<<<<< HEAD
       ],
       "enabled": true,
       "schedule": [
         "before 3am UTC every day"
       ],
       "automerge": false
+=======
+      ]
+>>>>>>> 7694763 (Fix renovate)
     },
     {
       "description": "Update the Renovate GitHub action weekly with fix type",
       "matchPackageNames": ["renovatebot/github-action"],
       "extends": [":semanticCommitType(fix)", "schedule:weekly"],
+<<<<<<< HEAD
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+=======
+      "matchUpdateTypes": ["minor", "patch"]
+>>>>>>> 7694763 (Fix renovate)
     }
   ],
   "github-actions": {
