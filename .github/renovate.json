@@ -12,11 +12,6 @@
     "yarnDedupeHighest",
     "rustCargoToml"
   ],
-  "enabledManagers": [
-    "dockerfile",
-    "npm",
-    "nix"
-  ],
   "packageRules": [
     {
       "groupName": "Docker base images",
